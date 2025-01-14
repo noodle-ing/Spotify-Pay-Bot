@@ -1,5 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Quartz;
+using Quartz.Impl;
+using SpotifyTelegramBot;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -47,12 +50,24 @@ class Program
         // Обязательно ставим блок try-catch, чтобы наш бот не "падал" в случае каких-либо ошибок
         try
         {
+            var message = update.Message;
+            var chat = message.Chat;
+            
+            
             // Сразу же ставим конструкцию switch, чтобы обрабатывать приходящие Update
             switch (update.Type)
             {
                 case UpdateType.Message:
                 {
-                    Console.WriteLine($"Пришло сообщение!");
+                    if (message.Text == "/start")
+                    {
+                        await botClient.SendTextMessageAsync(
+                                chat.Id,  // это обязательное поле
+                            $"Этот бот для опалты {chat.Id}"
+                            );
+                        PaymentReminder();
+                        return;
+                    }
                     return;
                 }
             }
@@ -76,4 +91,28 @@ class Program
         Console.WriteLine(ErrorMessage);
         return Task.CompletedTask;
     }
+
+    private static async void PaymentReminder()
+    {
+        IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
+        await scheduler.Start();
+
+        // Define a job and link it to the ReminderJob class
+        IJobDetail job = JobBuilder.Create<ReminderJob>()
+            .WithIdentity("monthlyReminder")
+            .Build();
+
+        // Create a trigger to run the job every month on the 1st at 9:00 AM
+        ITrigger trigger = TriggerBuilder.Create()
+            .WithIdentity("monthlyTrigger")
+            .StartNow()
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(15, 2, 50))
+            .Build();
+
+        // Schedule the job
+        await scheduler.ScheduleJob(job, trigger);
+
+        Console.WriteLine("Press [Enter] to exit...");
+    }
+    
 }
