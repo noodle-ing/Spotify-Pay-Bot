@@ -1,11 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using SpotifyTelegramBot;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
-// using Update = SpotifyTelegramBot.Update; !!!! never use it !!!! -> methods doesnt work 
+// using Update = SpotifyTelegramBot.Update;             !!!! never use it !!!! -> methods doesnt work 
 using Update = Telegram.Bot.Types.Update; 
 
 class Program
@@ -18,7 +17,7 @@ class Program
     
     static async Task Main()
     {
-        _botClient = new TelegramBotClient("<token>"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
+        _botClient = new TelegramBotClient("6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
         _receiverOptions = new ReceiverOptions // Также присваем значение настройкам бота
         {
             AllowedUpdates = new[] // Тут указываем типы получаемых Update`ов, о них подробнее расказано тут https://core.telegram.org/bots/api#update
@@ -53,7 +52,7 @@ class Program
             {
                 case UpdateType.Message:
                 {
-                    Console.WriteLine("Пришло сообщение!");
+                    Console.WriteLine($"Пришло сообщение!");
                     return;
                 }
             }
