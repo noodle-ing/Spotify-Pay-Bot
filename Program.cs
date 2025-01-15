@@ -7,7 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
-// using Update = SpotifyTelegramBot.Update;             !!!! never use it !!!! -> methods doesnt work 
+// using Update = SpotifyTelegramBot.Update;          !!!! never use it !!!! -> methods doesnt work 
 using Update = Telegram.Bot.Types.Update; 
 
 class Program
@@ -29,7 +29,7 @@ class Program
             },
             // Параметр, отвечающий за обработку сообщений, пришедших за то время, когда ваш бот был оффлайн
             // True - не обрабатывать, False (стоит по умолчанию) - обрабаывать
-            ThrowPendingUpdates = true, // for fix it use 19 version of library 
+            ThrowPendingUpdates = false  // for fix it use 19 version of library 
         };
         
         using var cts = new CancellationTokenSource();
@@ -42,6 +42,8 @@ class Program
         Console.WriteLine($"{me.FirstName} запущен!");
         
         await Task.Delay(-1); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
+        
+        
         
     }
     
@@ -63,7 +65,7 @@ class Program
                     {
                         await botClient.SendTextMessageAsync(
                                 chat.Id,  // это обязательное поле
-                            $"Этот бот для опалты {chat.Id}"
+                            $"Этот бот для опалты {chat.Id} {_botClient}"
                             );
                         PaymentReminder();
                         return;
@@ -94,19 +96,21 @@ class Program
 
     private static async void PaymentReminder()
     {
+        
         IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
         await scheduler.Start();
 
         // Define a job and link it to the ReminderJob class
         IJobDetail job = JobBuilder.Create<ReminderJob>()
             .WithIdentity("monthlyReminder")
+            .UsingJobData("botClient", "6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc") // Pass the bot token as a string
             .Build();
 
-        // Create a trigger to run the job every month on the 1st at 9:00 AM
+        // Create a trigger to run the job every month on the 15th at 18:14
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(15, 2, 50))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(15, 19, 33))
             .Build();
 
         // Schedule the job

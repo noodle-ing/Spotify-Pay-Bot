@@ -1,32 +1,39 @@
 ﻿using Quartz;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace SpotifyTelegramBot;
 
 public class ReminderJob : IJob
 {
-    private readonly ITelegramBotClient _botClient;
-
-    // Constructor to inject the bot client
-    public ReminderJob(ITelegramBotClient botClient)
-    {
-        _botClient = botClient;
-    }
-
-    // Execute method expected by Quartz
     public async Task Execute(IJobExecutionContext context)
     {
-        // Retrieve chatId dynamically or from your context if needed
-        long chatId = 1388592896;  // Replace with a valid chat ID or logic to get it
+        try
+        {
+            Console.WriteLine("Reminder job executed.");
 
-        Console.WriteLine($"Reminder sent! Time: {DateTime.Now}");
+            // Retrieve the bot client from JobDataMap
+            var botToken = context.MergedJobDataMap.GetString("botClient");
+            if (string.IsNullOrEmpty(botToken))
+            {
+                throw new Exception("Bot token is missing in JobDataMap.");
+            }
 
-        // Send reminder message
-        await _botClient.SendTextMessageAsync(
-            chatId, // Chat ID where the message should be sent
-            "Время отправить Алтынай 700 тг"
-        );
+            // Create a new bot client instance
+            var botClient = new TelegramBotClient(botToken);
+
+            long chatId = 1388592896; // Replace with actual chat ID
+
+            // Send the reminder
+            await botClient.SendTextMessageAsync(
+                chatId,
+                "Время отправить Алтынай 700 тг"
+            );
+
+            Console.WriteLine("Reminder sent successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in ReminderJob: {ex.Message}");
+        }
     }
-    
 }
