@@ -18,6 +18,10 @@ class Program
     // Это объект с настройками работы бота. Здесь мы будем указывать, какие типы Update мы будем получать, Timeout бота и так далее.
     private static ReceiverOptions _receiverOptions;
     
+    public static List<long> spotifyUsers = new List<long>();       
+    public static List<long> payedUsers = new List<long>();
+
+
     static async Task Main()
     {
         _botClient = new TelegramBotClient("6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
@@ -43,8 +47,6 @@ class Program
         
         await Task.Delay(-1); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
         
-        
-        
     }
     
     private static async Task UpdateHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -54,7 +56,6 @@ class Program
         {
             var message = update.Message;
             var chat = message.Chat;
-            List<long> spotifyUsers = new List<long>();            
             // Сразу же ставим конструкцию switch, чтобы обрабатывать приходящие Update
             switch (update.Type)
             {
@@ -75,11 +76,23 @@ class Program
                     if (message.Text == "/payed")
                     {
                         var user = message.From;
-                        Console.WriteLine($"{user.Id}");
-                        await botClient.SendTextMessageAsync(
-                            chat.Id,
-                            $"Ваш ID {user.Id}"
-                        );
+                        long userId = user.Id;
+                        if (CheckingUserMembership(userId) && UserNeedToPay(userId))
+                        {
+                            payedUsers.Add(userId);
+                            Console.WriteLine($"{user.Id} добавлен в список оплаченных");
+                            await botClient.SendTextMessageAsync(
+                                chat.Id,
+                                $"пользователь {user.Username} оплатил!"
+                            );
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(
+                                chat.Id,
+                                $"пользователь {user.Username} уже оплатил!"
+                            );
+                        }
                         return;
                     }
 
@@ -88,13 +101,19 @@ class Program
                         var newUser = message.From;
                         if (spotifyUsers.Count < 5)
                         {
-                            if (newUser != null) 
+                            if (newUser != null && NeedToRegister(newUser.Id))
+                            {
                                 spotifyUsers.Add(newUser.Id);
+                                await botClient.SendTextMessageAsync(
+                                    chat.Id,
+                                    "Новый пользователь зарегестрирован"
+                                );
+                            }
                             else
                             {
                                 await botClient.SendTextMessageAsync(
                                     chat.Id,
-                                    "Невозможно зарегестрировать нового пользователя"
+                                    "Данный пользователь уже зарегестрирован!"
                                 );
                             }
                         }
@@ -155,5 +174,40 @@ class Program
 
         Console.WriteLine("Press [Enter] to exit...");
     }
+
+    private static bool CheckingUserMembership(long userId)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            if (userId == spotifyUsers[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool UserNeedToPay(long userId)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            if (userId == payedUsers[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     
+    private static bool NeedToRegister(long userId)
+    {
+        foreach (var user in spotifyUsers)
+        {
+            if (userId == user)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
