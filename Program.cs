@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
+using System.Net.Http;
 // using Update = SpotifyTelegramBot.Update;          !!!! never use it !!!! -> methods doesnt work 
 using Update = Telegram.Bot.Types.Update; 
 
@@ -20,7 +21,8 @@ class Program
     
     public static List<long> spotifyUsers = new List<long>();       
     public static List<long> payedUsers = new List<long>();
-
+    
+    private static readonly HttpClient client = new HttpClient();
 
     static async Task Main()
     {
@@ -125,6 +127,11 @@ class Program
                                 "достигнуто максимальное количество участников подписки"
                             );
                         }
+                        
+                    }
+                    if (message.Text == "/ddd")
+                    {
+                        SendDirectMessage();
                     }
                     return;
                 }
@@ -209,5 +216,24 @@ class Program
             }
         }
         return true;
+    }
+
+    private static async void SendDirectMessage()
+    {
+        string botToken = "6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"; // Replace with your bot token
+        string userId = "1388592896 "; // Replace with the user's Telegram ID (same as chat ID for direct messages)
+        string message = "Hello! This is a direct message from the bot.";
+
+        string url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={userId}&text={message}";
+
+        HttpResponseMessage response = await client.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            System.Console.WriteLine("Message sent successfully!");
+        }
+        else
+        {
+            System.Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
+        }
     }
 }
