@@ -54,8 +54,7 @@ class Program
         {
             var message = update.Message;
             var chat = message.Chat;
-            
-            
+            List<long> spotifyUsers = new List<long>();            
             // Сразу же ставим конструкцию switch, чтобы обрабатывать приходящие Update
             switch (update.Type)
             {
@@ -72,6 +71,32 @@ class Program
                             );
                         PaymentReminder();
                         return;
+                    }
+                   
+
+                    if (message.Text == "/registerNewUser")
+                    {
+                        var newUser = message.From;
+                        if (spotifyUsers.Count < 5)
+                        {
+                            if (newUser != null) 
+                                spotifyUsers.Add(newUser.Id);
+                            else
+                            {
+                                await botClient.SendTextMessageAsync(
+                                    chat.Id,
+                                    "Невозможно зарегестрировать нового пользователя"
+                                );
+                            }
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(
+                                chat.Id,
+                                "Невозможно зарегестрировать нового пользователя \n" +
+                                "достигнуто максимальное количество участников подписки"
+                            );
+                        }
                     }
                     return;
                 }
