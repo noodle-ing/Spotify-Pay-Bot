@@ -72,7 +72,16 @@ class Program
                         PaymentReminder();
                         return;
                     }
-                   
+                    if (message.Text == "/payed")
+                    {
+                        var user = message.From;
+                        Console.WriteLine($"{user.Id}");
+                        await botClient.SendTextMessageAsync(
+                            chat.Id,
+                            $"Ваш ID {user.Id}"
+                        );
+                        return;
+                    }
 
                     if (message.Text == "/registerNewUser")
                     {
