@@ -177,9 +177,9 @@ class Program
 
     private static bool CheckingUserMembership(long userId)
     {
-        for (int i = 0; i < 5; i++)
+        foreach (var user in spotifyUsers)
         {
-            if (userId == spotifyUsers[i])
+            if (userId == user)
             {
                 return true;
             }
@@ -189,9 +189,9 @@ class Program
 
     private static bool UserNeedToPay(long userId)
     {
-        for (int i = 0; i < 5; i++)
+        foreach (var user in payedUsers)
         {
-            if (userId == payedUsers[i])
+            if (userId == user)
             {
                 return false;
             }
