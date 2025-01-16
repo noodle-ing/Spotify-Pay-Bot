@@ -65,7 +65,10 @@ class Program
                     {
                         await botClient.SendTextMessageAsync(
                                 chat.Id,  // это обязательное поле
-                            $"Этот бот для опалты {chat.Id} {_botClient}"
+                            $"Всем привет это бот для ежемесячного \n {chat.Id} {_botClient}" +
+                            $"напоминания об оплате подписки Spotify.\n" +
+                            $"Каждый месяц 3 числа я буду отпарвлять уведомления в группу" +
+                            $"о необходимости оплаты."
                             );
                         PaymentReminder();
                         return;
@@ -110,7 +113,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(15, 19, 33))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(16, 21, 25))
             .Build();
 
         // Schedule the job

@@ -21,12 +21,13 @@ public class ReminderJob : IJob
             // Create a new bot client instance
             var botClient = new TelegramBotClient(botToken);
 
-            long chatId = 1388592896; // Replace with actual chat ID
+            long chatId = -4606140584 ; // Replace with actual chat ID
 
             // Send the reminder
             await botClient.SendTextMessageAsync(
                 chatId,
-                "Время отправить Алтынай 700 тг"
+                "Всем привет! Время оплаты подписки \n" +
+                "Скидываем как обычно 700 тг"
             );
 
             Console.WriteLine("Reminder sent successfully.");
