@@ -176,7 +176,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(16, 21, 25))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(18, 1, 46))
             .Build();
 
         // Schedule the job
