@@ -83,6 +83,7 @@ class Program
                         if (CheckingUserMembership(userId) && UserNeedToPay(userId))
                         {
                             payedUsers.Add(RegisterNewUser(userId));
+                            SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json", payedUsers);
                             Console.WriteLine($"{user.Id} добавлен в список оплаченных");
                             await botClient.SendTextMessageAsync(
                                 chat.Id,
@@ -200,6 +201,7 @@ class Program
 
     private static bool UserNeedToPay(long userId)
     {
+        payedUsers = LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
         foreach (var user in payedUsers)
         {
             if (userId == user.Id)
@@ -269,6 +271,4 @@ class Program
         string json = File.ReadAllText(filePath);
         return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
     }
-    
-    
 }
