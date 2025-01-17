@@ -8,6 +8,7 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using System.Net.Http;
+using Newtonsoft.Json;
 // using Update = SpotifyTelegramBot.Update;          !!!! never use it !!!! -> methods doesnt work 
 using Update = Telegram.Bot.Types.Update; 
 
@@ -19,8 +20,8 @@ class Program
     // Это объект с настройками работы бота. Здесь мы будем указывать, какие типы Update мы будем получать, Timeout бота и так далее.
     private static ReceiverOptions _receiverOptions;
     
-    public static List<long> spotifyUsers = new List<long>();       
-    public static List<long> payedUsers = new List<long>();
+    public static List<User> spotifyUsers = new ();       
+    public static List<User> payedUsers = new ();
     
     private static readonly HttpClient client = new HttpClient();
 
@@ -81,7 +82,7 @@ class Program
                         long userId = user.Id;
                         if (CheckingUserMembership(userId) && UserNeedToPay(userId))
                         {
-                            payedUsers.Add(userId);
+                            payedUsers.Add(RegisterNewUser(userId));
                             Console.WriteLine($"{user.Id} добавлен в список оплаченных");
                             await botClient.SendTextMessageAsync(
                                 chat.Id,
@@ -101,11 +102,13 @@ class Program
                     if (message.Text == "/registerNewUser")
                     {
                         var newUser = message.From;
+                        long userId = newUser.Id;
                         if (spotifyUsers.Count < 5)
                         {
-                            if (newUser != null && NeedToRegister(newUser.Id))
+                            if (newUser != null && NeedToRegister(userId))
                             {
-                                spotifyUsers.Add(newUser.Id);
+                                spotifyUsers.Add(RegisterNewUser(userId));
+                                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
                                 await botClient.SendTextMessageAsync(
                                     chat.Id,
                                     "Новый пользователь зарегестрирован"
@@ -127,7 +130,6 @@ class Program
                                 "достигнуто максимальное количество участников подписки"
                             );
                         }
-                        
                     }
                     if (message.Text == "/ddd")
                     {
@@ -184,10 +186,12 @@ class Program
 
     private static bool CheckingUserMembership(long userId)
     {
+        spotifyUsers =
+            LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json");
         foreach (var user in spotifyUsers)
         {
-            if (userId == user)
-            {
+            if (userId == user.Id)
+            { 
                 return true;
             }
         }
@@ -198,7 +202,7 @@ class Program
     {
         foreach (var user in payedUsers)
         {
-            if (userId == user)
+            if (userId == user.Id)
             {
                 return false;
             }
@@ -208,9 +212,11 @@ class Program
     
     private static bool NeedToRegister(long userId)
     {
+        spotifyUsers =
+            LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json");
         foreach (var user in spotifyUsers)
         {
-            if (userId == user)
+            if (userId== user.Id)
             {
                 return false;
             }
@@ -236,4 +242,33 @@ class Program
             System.Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
         }
     }
+    
+    private static User RegisterNewUser(long userId)
+    {
+        User newRegisterUser = new User();
+        newRegisterUser.Id = userId;
+        return newRegisterUser; 
+    }
+    
+    static void SaveUsers(string filePath, List<User> users)
+    {
+        // Serialize the list to JSON and write it to the file
+        string json = JsonConvert.SerializeObject(users, Formatting.Indented);
+        File.WriteAllText(filePath, json);
+    }
+    
+    static List<User> LoadUsers(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            // If the file doesn't exist, return an empty list
+            return new List<User>();
+        }
+
+        // Read and deserialize the JSON file
+        string json = File.ReadAllText(filePath);
+        return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+    }
+    
+    
 }
