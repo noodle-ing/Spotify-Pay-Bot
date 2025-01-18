@@ -1,4 +1,5 @@
-﻿using Quartz;
+﻿using Newtonsoft.Json;
+using Quartz;
 using Telegram.Bot;
 
 namespace SpotifyTelegramBot;
@@ -29,6 +30,7 @@ public class ReminderJob : IJob
                 "Всем привет! Время оплаты подписки \n" +
                 "Скидываем как обычно 700 тг"
             );
+            CleanPayedList("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
 
             Console.WriteLine("Reminder sent successfully.");
         }
@@ -36,5 +38,12 @@ public class ReminderJob : IJob
         {
             Console.WriteLine($"Error in ReminderJob: {ex.Message}");
         }
+    }
+
+    public void CleanPayedList(string filePath)
+    {
+        List<User> cleanPayList = new List<User>();
+        string json = JsonConvert.SerializeObject(cleanPayList, Formatting.Indented);
+        File.WriteAllText(filePath, json);
     }
 }

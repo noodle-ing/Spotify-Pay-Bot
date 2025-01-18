@@ -7,6 +7,8 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
+using System.Net.Http;
+using Newtonsoft.Json;
 // using Update = SpotifyTelegramBot.Update;          !!!! never use it !!!! -> methods doesnt work 
 using Update = Telegram.Bot.Types.Update; 
 
@@ -18,6 +20,11 @@ class Program
     // Это объект с настройками работы бота. Здесь мы будем указывать, какие типы Update мы будем получать, Timeout бота и так далее.
     private static ReceiverOptions _receiverOptions;
     
+    public static List<User> spotifyUsers = new ();       
+    public static List<User> payedUsers = new ();
+    
+    private static readonly HttpClient client = new HttpClient();
+
     static async Task Main()
     {
         _botClient = new TelegramBotClient("6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
@@ -43,8 +50,6 @@ class Program
         
         await Task.Delay(-1); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
         
-        
-        
     }
     
     private static async Task UpdateHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -54,8 +59,6 @@ class Program
         {
             var message = update.Message;
             var chat = message.Chat;
-            
-            
             // Сразу же ставим конструкцию switch, чтобы обрабатывать приходящие Update
             switch (update.Type)
             {
@@ -72,6 +75,66 @@ class Program
                             );
                         PaymentReminder();
                         return;
+                    }
+                    if (message.Text == "/payed")
+                    {
+                        var user = message.From;
+                        long userId = user.Id;
+                        if (CheckingUserMembership(userId) && UserNeedToPay(userId))
+                        {
+                            payedUsers.Add(RegisterNewUser(userId));
+                            SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json", payedUsers);
+                            Console.WriteLine($"{user.Id} добавлен в список оплаченных");
+                            await botClient.SendTextMessageAsync(
+                                chat.Id,
+                                $"пользователь {user.Username} оплатил!"
+                            );
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(
+                                chat.Id,
+                                $"пользователь {user.Username} уже оплатил!"
+                            );
+                        }
+                        return;
+                    }
+
+                    if (message.Text == "/registerNewUser")
+                    {
+                        var newUser = message.From;
+                        long userId = newUser.Id;
+                        if (spotifyUsers.Count < 5)
+                        {
+                            if (newUser != null && NeedToRegister(userId))
+                            {
+                                spotifyUsers.Add(RegisterNewUser(userId));
+                                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
+                                await botClient.SendTextMessageAsync(
+                                    chat.Id,
+                                    "Новый пользователь зарегестрирован"
+                                );
+                            }
+                            else
+                            {
+                                await botClient.SendTextMessageAsync(
+                                    chat.Id,
+                                    "Данный пользователь уже зарегестрирован!"
+                                );
+                            }
+                        }
+                        else
+                        {
+                            await botClient.SendTextMessageAsync(
+                                chat.Id,
+                                "Невозможно зарегестрировать нового пользователя \n" +
+                                "достигнуто максимальное количество участников подписки"
+                            );
+                        }
+                    }
+                    if (message.Text == "/ddd")
+                    {
+                        SendDirectMessage();
                     }
                     return;
                 }
@@ -113,7 +176,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(16, 21, 25))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(18, 1, 46))
             .Build();
 
         // Schedule the job
@@ -121,5 +184,91 @@ class Program
 
         Console.WriteLine("Press [Enter] to exit...");
     }
+
+    private static bool CheckingUserMembership(long userId)
+    {
+        spotifyUsers =
+            LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json");
+        foreach (var user in spotifyUsers)
+        {
+            if (userId == user.Id)
+            { 
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool UserNeedToPay(long userId)
+    {
+        payedUsers = LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
+        foreach (var user in payedUsers)
+        {
+            if (userId == user.Id)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     
+    private static bool NeedToRegister(long userId)
+    {
+        spotifyUsers =
+            LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json");
+        foreach (var user in spotifyUsers)
+        {
+            if (userId== user.Id)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static async void SendDirectMessage()
+    {
+        string botToken = "6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"; // Replace with your bot token
+        string userId = "1388592896 "; // Replace with the user's Telegram ID (same as chat ID for direct messages)
+        string message = "Hello! This is a direct message from the bot.";
+
+        string url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={userId}&text={message}";
+
+        HttpResponseMessage response = await client.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            System.Console.WriteLine("Message sent successfully!");
+        }
+        else
+        {
+            System.Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
+        }
+    }
+    
+    private static User RegisterNewUser(long userId)
+    {
+        User newRegisterUser = new User();
+        newRegisterUser.Id = userId;
+        return newRegisterUser; 
+    }
+    
+    static void SaveUsers(string filePath, List<User> users)
+    {
+        // Serialize the list to JSON and write it to the file
+        string json = JsonConvert.SerializeObject(users, Formatting.Indented);
+        File.WriteAllText(filePath, json);
+    }
+    
+    static List<User> LoadUsers(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            // If the file doesn't exist, return an empty list
+            return new List<User>();
+        }
+
+        // Read and deserialize the JSON file
+        string json = File.ReadAllText(filePath);
+        return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+    }
 }
