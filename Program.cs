@@ -68,12 +68,20 @@ class Program
                     {
                         await botClient.SendTextMessageAsync(
                                 chat.Id,  // это обязательное поле
-                            $"Всем привет это бот для ежемесячного \n {chat.Id} {_botClient}" +
+                            $"Всем привет это бот для ежемесячного \n" +
                             $"напоминания об оплате подписки Spotify.\n" +
                             $"Каждый месяц 3 числа я буду отпарвлять уведомления в группу" +
-                            $"о необходимости оплаты."
+                            $" о необходимости оплаты.\n" +
+                            $"\n" +
+                            $"Для начла работы бота: \n" +
+                            $"\n" +
+                            $"1) Активируйте бота у себя в личных сообщениях просто нажав на start\n" +
+                            $"\n" +
+                            $"2) Подпишитесь на ежемесячные уведомления \n" +
+                            $"\n" +
+                            $"3) Каждый раз после оплаты не забывайте нажимать на кнопку оплатил \n" +
+                            $"Если забудете это сделать то бот отправт в лс уведомление о том что вы забыли оплатить"
                             );
-                        PaymentReminder();
                         return;
                     }
                     if (message.Text == "/payed")
@@ -132,9 +140,14 @@ class Program
                             );
                         }
                     }
-                    if (message.Text == "/ddd")
+                    if (message.Text == "/setReminder")
                     {
-                        SendDirectMessage();
+                        await botClient.SendTextMessageAsync(
+                            chat.Id,  // это обязательное поле
+                            $"Ежемесячные уведомления включены"
+                        );
+                        PaymentReminder();
+                        return;
                     }
                     return;
                 }
@@ -162,7 +175,6 @@ class Program
 
     private static async void PaymentReminder()
     {
-        
         IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
         await scheduler.Start();
 
@@ -176,7 +188,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(18, 1, 46))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(3, 10, 0))
             .Build();
 
         // Schedule the job
@@ -225,25 +237,7 @@ class Program
         }
         return true;
     }
-
-    private static async void SendDirectMessage()
-    {
-        string botToken = "6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"; // Replace with your bot token
-        string userId = "1388592896 "; // Replace with the user's Telegram ID (same as chat ID for direct messages)
-        string message = "Hello! This is a direct message from the bot.";
-
-        string url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={userId}&text={message}";
-
-        HttpResponseMessage response = await client.GetAsync(url);
-        if (response.IsSuccessStatusCode)
-        {
-            System.Console.WriteLine("Message sent successfully!");
-        }
-        else
-        {
-            System.Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
-        }
-    }
+    
     
     private static User RegisterNewUser(long userId)
     {
@@ -259,14 +253,13 @@ class Program
         File.WriteAllText(filePath, json);
     }
     
-    static List<User> LoadUsers(string filePath)
+    public static List<User> LoadUsers(string filePath)
     {
         if (!File.Exists(filePath))
         {
             // If the file doesn't exist, return an empty list
             return new List<User>();
         }
-
         // Read and deserialize the JSON file
         string json = File.ReadAllText(filePath);
         return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
