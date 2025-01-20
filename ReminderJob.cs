@@ -31,8 +31,8 @@ public class ReminderJob : IJob
                 "Всем привет! Время оплаты подписки \n" +
                 "Скидываем как обычно 700 тг"
             );
-            CleanPayedList("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json"); 
-
+            CleanPayedList("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
+            ScheduleFollowUp(botToken);
             Console.WriteLine("Reminder sent successfully.");
         }
         catch (Exception ex)
@@ -61,9 +61,7 @@ public class ReminderJob : IJob
 
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("followUpTrigger")
-            // .StartAt(DateTimeOffset.Now.AddDays(3)) // Run 3 days later
-            .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(18, 1, 46))
+            .StartAt(DateTimeOffset.Now.AddDays(3)) // Run 3 days later
             .Build();
 
         await scheduler.ScheduleJob(followUpJob, trigger);

@@ -68,12 +68,11 @@ class Program
                     {
                         await botClient.SendTextMessageAsync(
                                 chat.Id,  // это обязательное поле
-                            $"Всем привет это бот для ежемесячного \n {chat.Id} {_botClient}" +
+                            $"Всем привет это бот для ежемесячного \n" +
                             $"напоминания об оплате подписки Spotify.\n" +
                             $"Каждый месяц 3 числа я буду отпарвлять уведомления в группу" +
                             $"о необходимости оплаты."
                             );
-                        PaymentReminder();
                         return;
                     }
                     if (message.Text == "/payed")
@@ -132,10 +131,15 @@ class Program
                             );
                         }
                     }
-                    // if (message.Text == "/ddd")
-                    // {
-                    //     SendDirectMessage();
-                    // }
+                    if (message.Text == "/setReminder")
+                    {
+                        await botClient.SendTextMessageAsync(
+                            chat.Id,  // это обязательное поле
+                            $"Ежемесячные уведомления включены"
+                        );
+                        PaymentReminder();
+                        return;
+                    }
                     return;
                 }
             }
@@ -175,7 +179,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(18, 1, 46))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(3, 10, 0))
             .Build();
 
         // Schedule the job
