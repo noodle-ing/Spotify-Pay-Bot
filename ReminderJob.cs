@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Quartz;
+using Quartz.Impl;
 using Telegram.Bot;
 
 namespace SpotifyTelegramBot;
@@ -30,7 +31,7 @@ public class ReminderJob : IJob
                 "Всем привет! Время оплаты подписки \n" +
                 "Скидываем как обычно 700 тг"
             );
-            CleanPayedList("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
+            CleanPayedList("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json"); 
 
             Console.WriteLine("Reminder sent successfully.");
         }
@@ -45,5 +46,28 @@ public class ReminderJob : IJob
         List<User> cleanPayList = new List<User>();
         string json = JsonConvert.SerializeObject(cleanPayList, Formatting.Indented);
         File.WriteAllText(filePath, json);
+    }
+    
+    
+    private static async void ScheduleFollowUp(string botToken)
+    {
+        IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
+        await scheduler.Start();
+
+        IJobDetail followUpJob = JobBuilder.Create<ForgetReminder>()
+            .WithIdentity("followUpReminder")
+            .UsingJobData("botClient", botToken)
+            .Build();
+
+        ITrigger trigger = TriggerBuilder.Create()
+            .WithIdentity("followUpTrigger")
+            // .StartAt(DateTimeOffset.Now.AddDays(3)) // Run 3 days later
+            .StartNow()
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(18, 1, 46))
+            .Build();
+
+        await scheduler.ScheduleJob(followUpJob, trigger);
+
+        Console.WriteLine("Follow-up job scheduled.");
     }
 }

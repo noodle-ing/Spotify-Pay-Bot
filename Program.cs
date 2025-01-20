@@ -132,10 +132,10 @@ class Program
                             );
                         }
                     }
-                    if (message.Text == "/ddd")
-                    {
-                        SendDirectMessage();
-                    }
+                    // if (message.Text == "/ddd")
+                    // {
+                    //     SendDirectMessage();
+                    // }
                     return;
                 }
             }
@@ -162,7 +162,6 @@ class Program
 
     private static async void PaymentReminder()
     {
-        
         IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
         await scheduler.Start();
 
@@ -226,22 +225,21 @@ class Program
         return true;
     }
 
-    private static async void SendDirectMessage()
+    private static async void SendDirectMessage(long userWhoForget)
     {
         string botToken = "6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"; // Replace with your bot token
-        string userId = "1388592896 "; // Replace with the user's Telegram ID (same as chat ID for direct messages)
         string message = "Hello! This is a direct message from the bot.";
 
-        string url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={userId}&text={message}";
-
+        string url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={userWhoForget}&text={message}";
+        
         HttpResponseMessage response = await client.GetAsync(url);
         if (response.IsSuccessStatusCode)
         {
-            System.Console.WriteLine("Message sent successfully!");
+            Console.WriteLine("Message sent successfully!");
         }
         else
         {
-            System.Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
+            Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
         }
     }
     
@@ -259,14 +257,13 @@ class Program
         File.WriteAllText(filePath, json);
     }
     
-    static List<User> LoadUsers(string filePath)
+    public static List<User> LoadUsers(string filePath)
     {
         if (!File.Exists(filePath))
         {
             // If the file doesn't exist, return an empty list
             return new List<User>();
         }
-
         // Read and deserialize the JSON file
         string json = File.ReadAllText(filePath);
         return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
