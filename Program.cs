@@ -237,24 +237,7 @@ class Program
         }
         return true;
     }
-
-    private static async void SendDirectMessage(long userWhoForget)
-    {
-        string botToken = "6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"; // Replace with your bot token
-        string message = "Hello! This is a direct message from the bot.";
-
-        string url = $"https://api.telegram.org/bot{botToken}/sendMessage?chat_id={userWhoForget}&text={message}";
-        
-        HttpResponseMessage response = await client.GetAsync(url);
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("Message sent successfully!");
-        }
-        else
-        {
-            Console.WriteLine($"Failed to send message. Status code: {response.StatusCode}");
-        }
-    }
+    
     
     private static User RegisterNewUser(long userId)
     {
