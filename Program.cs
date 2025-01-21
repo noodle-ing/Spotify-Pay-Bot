@@ -81,33 +81,8 @@ class Program
                     {
                         var newUser = message.From;
                         long userId = newUser.Id;
-                        if (spotifyUsers.Count < 5)
-                        {
-                            if (newUser != null && NeedToRegister(userId))
-                            {
-                                spotifyUsers.Add(RegisterNewUser(userId));
-                                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
-                                await botClient.SendTextMessageAsync(
-                                    chat.Id,
-                                    "Новый пользователь зарегестрирован"
-                                );
-                            }
-                            else
-                            {
-                                await botClient.SendTextMessageAsync(
-                                    chat.Id,
-                                    "Данный пользователь уже зарегестрирован!"
-                                );
-                            }
-                        }
-                        else
-                        {
-                            await botClient.SendTextMessageAsync(
-                                chat.Id,
-                                "Невозможно зарегестрировать нового пользователя \n" +
-                                "достигнуто максимальное количество участников подписки"
-                            );
-                        }
+                        NewUserRegistration(botClient, newUser.Username, userId, chat.Id);
+
                     }
                     if (message.Text == "/setReminder")
                     {
@@ -282,6 +257,37 @@ class Program
             await botClient.SendTextMessageAsync(
                 chatId,
                 $"пользователю {userName} сперва нужно зарегестрироватся"
+            );
+        }
+    }
+    
+    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId)
+    {
+        if (spotifyUsers.Count < 5)
+        {
+            if (NeedToRegister(userId))
+            {
+                spotifyUsers.Add(RegisterNewUser(userId));
+                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    "Новый пользователь зарегестрирован"
+                );
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    "Данный пользователь уже зарегестрирован!"
+                );
+            }
+        }
+        else
+        {
+            await botClient.SendTextMessageAsync(
+                chatId,
+                "Невозможно зарегестрировать нового пользователя \n" +
+                "достигнуто максимальное количество участников подписки"
             );
         }
     }
