@@ -19,12 +19,11 @@ class Program
     
     // Это объект с настройками работы бота. Здесь мы будем указывать, какие типы Update мы будем получать, Timeout бота и так далее.
     private static ReceiverOptions _receiverOptions;
-    
-    public static List<User> spotifyUsers = new ();       
-    public static List<User> payedUsers = new ();
-    
-    private static readonly HttpClient client = new HttpClient();
 
+    private static List<User> spotifyUsers = new ();
+    private static List<User> payedUsers = new ();
+    
+    private static readonly HttpClient client = new();
     static async Task Main()
     {
         _botClient = new TelegramBotClient("6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
@@ -46,9 +45,9 @@ class Program
         _botClient.StartReceiving(UpdateHandler, ErrorHandler, _receiverOptions, cts.Token); // Запускаем бота
         
         var me = await _botClient.GetMeAsync(); // Создаем переменную, в которую помещаем информацию о нашем боте.
-        Console.WriteLine($"{me.FirstName} запущен!");
+        Console.WriteLine($"{me.FirstName} is running!");
         
-        await Task.Delay(-1); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
+        await Task.Delay(Timeout.Infinite); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
         
     }
     
@@ -66,45 +65,15 @@ class Program
                 {
                     if (message.Text == "/start")
                     {
-                        await botClient.SendTextMessageAsync(
-                                chat.Id,  // это обязательное поле
-                            $"Всем привет это бот для ежемесячного \n" +
-                            $"напоминания об оплате подписки Spotify.\n" +
-                            $"Каждый месяц 3 числа я буду отпарвлять уведомления в группу" +
-                            $" о необходимости оплаты.\n" +
-                            $"\n" +
-                            $"Для начла работы бота: \n" +
-                            $"\n" +
-                            $"1) Активируйте бота у себя в личных сообщениях просто нажав на start\n" +
-                            $"\n" +
-                            $"2) Подпишитесь на ежемесячные уведомления \n" +
-                            $"\n" +
-                            $"3) Каждый раз после оплаты не забывайте нажимать на кнопку оплатил \n" +
-                            $"Если забудете это сделать то бот отправт в лс уведомление о том что вы забыли оплатить"
-                            );
+                        SendWelcomMessage(botClient, chat.Id);
                         return;
                     }
                     if (message.Text == "/payed")
                     {
                         var user = message.From;
                         long userId = user.Id;
-                        if (CheckingUserMembership(userId) && UserNeedToPay(userId))
-                        {
-                            payedUsers.Add(RegisterNewUser(userId));
-                            SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json", payedUsers);
-                            Console.WriteLine($"{user.Id} добавлен в список оплаченных");
-                            await botClient.SendTextMessageAsync(
-                                chat.Id,
-                                $"пользователь {user.Username} оплатил!"
-                            );
-                        }
-                        else
-                        {
-                            await botClient.SendTextMessageAsync(
-                                chat.Id,
-                                $"пользователь {user.Username} уже оплатил!"
-                            );
-                        }
+                        var userName = user.Username;
+                        PaymentMessage(botClient, userId, chat.Id, userName);
                         return;
                     }
 
@@ -112,33 +81,8 @@ class Program
                     {
                         var newUser = message.From;
                         long userId = newUser.Id;
-                        if (spotifyUsers.Count < 5)
-                        {
-                            if (newUser != null && NeedToRegister(userId))
-                            {
-                                spotifyUsers.Add(RegisterNewUser(userId));
-                                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
-                                await botClient.SendTextMessageAsync(
-                                    chat.Id,
-                                    "Новый пользователь зарегестрирован"
-                                );
-                            }
-                            else
-                            {
-                                await botClient.SendTextMessageAsync(
-                                    chat.Id,
-                                    "Данный пользователь уже зарегестрирован!"
-                                );
-                            }
-                        }
-                        else
-                        {
-                            await botClient.SendTextMessageAsync(
-                                chat.Id,
-                                "Невозможно зарегестрировать нового пользователя \n" +
-                                "достигнуто максимальное количество участников подписки"
-                            );
-                        }
+                        NewUserRegistration(botClient, newUser.Username, userId, chat.Id);
+
                     }
                     if (message.Text == "/setReminder")
                     {
@@ -188,7 +132,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(3, 10, 0))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(21, 13, 17))
             .Build();
 
         // Schedule the job
@@ -263,5 +207,88 @@ class Program
         // Read and deserialize the JSON file
         string json = File.ReadAllText(filePath);
         return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+    }
+
+    private static async Task SendWelcomMessage(ITelegramBotClient botClient, long chatId)
+    {
+        await botClient.SendTextMessageAsync(
+            chatId,  // это обязательное поле
+            $"Всем привет это бот для ежемесячного \n" +
+            $"напоминания об оплате подписки Spotify.\n" +
+            $"Каждый месяц 3 числа я буду отпарвлять уведомления в группу" +
+            $" о необходимости оплаты.\n" +
+            $"\n" +
+            $"Для начла работы бота: \n" +
+            $"\n" +
+            $"1) Активируйте бота у себя в личных сообщениях просто нажав на start\n" +
+            $"\n" +
+            $"2) Подпишитесь на ежемесячные уведомления \n" +
+            $"\n" +
+            $"3) Каждый раз после оплаты не забывайте нажимать на кнопку оплатил \n" +
+            $"Если забудете это сделать то бот отправт в лс уведомление о том что вы забыли оплатить"
+        );
+    }
+
+    private static async Task PaymentMessage(ITelegramBotClient botClient, long userId, long chatId, string userName)
+    {
+        if (CheckingUserMembership(userId))
+        {
+            if (UserNeedToPay(userId))
+            {
+                payedUsers.Add(RegisterNewUser(userId));
+                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json", payedUsers);
+                Console.WriteLine($"{userId} добавлен в список оплаченных");
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    $"пользователь {userName} оплатил!"
+                );
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    $"пользователь {userName} уже оплатил"
+                );
+            }
+            
+        }
+        else
+        {
+            await botClient.SendTextMessageAsync(
+                chatId,
+                $"пользователю {userName} сперва нужно зарегестрироватся"
+            );
+        }
+    }
+    
+    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId)
+    {
+        if (spotifyUsers.Count < 5)
+        {
+            if (NeedToRegister(userId))
+            {
+                spotifyUsers.Add(RegisterNewUser(userId));
+                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    "Новый пользователь зарегестрирован"
+                );
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    "Данный пользователь уже зарегестрирован!"
+                );
+            }
+        }
+        else
+        {
+            await botClient.SendTextMessageAsync(
+                chatId,
+                "Невозможно зарегестрировать нового пользователя \n" +
+                "достигнуто максимальное количество участников подписки"
+            );
+        }
     }
 }
