@@ -82,15 +82,12 @@ class Program
                         var newUser = message.From;
                         long userId = newUser.Id;
                         NewUserRegistration(botClient, newUser.Username, userId, chat.Id);
+                        return;
 
                     }
                     if (message.Text == "/setReminder")
                     {
-                        await botClient.SendTextMessageAsync(
-                            chat.Id,  // это обязательное поле
-                            $"Ежемесячные уведомления включены"
-                        );
-                        PaymentReminder();
+                        RemindSender(botClient, chat.Id);
                         return;
                     }
                     return;
@@ -132,7 +129,7 @@ class Program
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("monthlyTrigger")
             .StartNow()
-            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(21, 13, 17))
+            .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(3, 10, 15))
             .Build();
 
         // Schedule the job
@@ -290,5 +287,14 @@ class Program
                 "достигнуто максимальное количество участников подписки"
             );
         }
+    }
+
+    private static async Task RemindSender(ITelegramBotClient botClient, long chatId)
+    {
+        await botClient.SendTextMessageAsync(
+            chatId,  // это обязательное поле
+            $"Ежемесячные уведомления включены"
+        );
+        PaymentReminder();
     }
 }
