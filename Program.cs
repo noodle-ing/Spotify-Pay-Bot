@@ -10,7 +10,6 @@ using Telegram.Bot.Types.Enums;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Update = Telegram.Bot.Types.Update; 
-
 class Program
 {
     private static ITelegramBotClient _botClient;
@@ -21,6 +20,9 @@ class Program
     private static List<User> payedUsers = new ();
     
     private static readonly HttpClient client = new();
+    
+    // static string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+    static string  filePath =Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/Subscribers.json"));
     static async Task Main()
     {
         _botClient = new TelegramBotClient("6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"); 
@@ -250,7 +252,7 @@ class Program
             if (NeedToRegister(userId))
             {
                 spotifyUsers.Add(RegisterNewUser(userId));
-                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json", spotifyUsers);
+                SaveUsers(filePath, spotifyUsers);
                 await botClient.SendTextMessageAsync(
                     chatId,
                     "Новый пользователь зарегестрирован"
