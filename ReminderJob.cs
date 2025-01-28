@@ -13,19 +13,16 @@ public class ReminderJob : IJob
         {
             Console.WriteLine("Reminder job executed.");
 
-            // Retrieve the bot client from JobDataMap
             var botToken = context.MergedJobDataMap.GetString("botClient");
             if (string.IsNullOrEmpty(botToken))
             {
                 throw new Exception("Bot token is missing in JobDataMap.");
             }
 
-            // Create a new bot client instance
             var botClient = new TelegramBotClient(botToken);
 
-            long chatId = -4606140584 ; // Replace with actual chat ID
+            long chatId = -4606140584 ; 
 
-            // Send the reminder
             await botClient.SendTextMessageAsync(
                 chatId,
                 "Всем привет! Время оплаты подписки \n" +
@@ -61,7 +58,7 @@ public class ReminderJob : IJob
 
         ITrigger trigger = TriggerBuilder.Create()
             .WithIdentity("followUpTrigger")
-            .StartAt(DateTimeOffset.Now.AddDays(3)) // Run 3 days later
+            .StartAt(DateTimeOffset.Now.AddDays(3)) 
             .Build();
 
         await scheduler.ScheduleJob(followUpJob, trigger);

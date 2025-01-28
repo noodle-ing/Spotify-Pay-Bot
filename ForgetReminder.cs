@@ -22,11 +22,9 @@ public class ForgetReminder : IJob
             string subscribersFilePath = "C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json";
             string payedUsersFilePath = "C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json";
 
-            // Load subscribers and payed users
             var allUsers = Program.LoadUsers(subscribersFilePath);
             var payedUsers = Program.LoadUsers(payedUsersFilePath);
 
-            // Find users who haven't paid
             var nonPayers = allUsers.Where(user => !payedUsers.Any(p => p.Id == user.Id)).ToList();
 
             foreach (var user in nonPayers)
