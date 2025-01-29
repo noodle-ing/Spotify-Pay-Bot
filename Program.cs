@@ -58,7 +58,7 @@ class Program
             {
                 case UpdateType.Message:
                 {
-                    if (message.Text == "/start")
+                    if (message.Text == "/start")  //done
                     {
                         SendWelcomMessage(botClient, chat.Id);
                         return;
@@ -80,7 +80,7 @@ class Program
                         return;
 
                     }
-                    if (message.Text == "/setReminder")
+                    if (message.Text == "/setReminder")  //done
                     {
                         RemindSender(botClient, chat.Id);
                         return;
@@ -129,7 +129,7 @@ class Program
         Console.WriteLine("Press [Enter] to exit...");
     }
 
-    private static bool CheckingUserMembership(long userId) //
+    private static bool CheckingUserMembership(long userId) //..
     {
         spotifyUsers =
             LoadUsers(filePathSubscribers);
@@ -143,7 +143,7 @@ class Program
         return false;
     }
 
-    private static bool UserNeedToPay(long userId) //
+    private static bool UserNeedToPay(long userId) //..
     {
         payedUsers = LoadUsers(filePathPayedUser);
         foreach (var user in payedUsers)
@@ -156,7 +156,7 @@ class Program
         return true;
     }
     
-    private static bool NeedToRegister(long userId) //
+    private static bool NeedToRegister(long userId) //..
     {
         spotifyUsers =
             LoadUsers(filePathSubscribers); 
@@ -178,13 +178,13 @@ class Program
         return newRegisterUser; 
     }
     
-    static void SaveUsers(string filePath, List<User> users) //
+    static void SaveUsers(string filePath, List<User> users) //...
     {
         string json = JsonConvert.SerializeObject(users, Formatting.Indented);
         File.WriteAllText(filePath, json);
     }
     
-    public static List<User> LoadUsers(string filePath) //
+    public static List<User> LoadUsers(string filePath) //...
     {
         if (!File.Exists(filePath))
         {
@@ -246,7 +246,7 @@ class Program
         }
     }
     
-    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId) //
+    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId) //userCon
     {
         if (spotifyUsers.Count < 5)
         {
