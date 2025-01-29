@@ -53,7 +53,7 @@ class Program
         try
         {
             var message = update.Message;
-            var chat = message.Chat;
+            var chat = message.Chat;    
             switch (update.Type)
             {
                 case UpdateType.Message:

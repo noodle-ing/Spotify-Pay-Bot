@@ -7,6 +7,10 @@ namespace SpotifyTelegramBot;
 
 public class ReminderJob : IJob
 {
+    private static long _chatId = -4606140584;
+    private string jsonPayedUserPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/PayedUsers.json"));
+    
+    
     public async Task Execute(IJobExecutionContext context)
     {
         try
@@ -20,15 +24,13 @@ public class ReminderJob : IJob
             }
 
             var botClient = new TelegramBotClient(botToken);
-
-            long chatId = -4606140584 ; 
-
+            
             await botClient.SendTextMessageAsync(
-                chatId,
+                _chatId,
                 "Всем привет! Время оплаты подписки \n" +
                 "Скидываем как обычно 700 тг"
             );
-            CleanPayedList("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
+            CleanPayedList(jsonPayedUserPath);
             ScheduleFollowUp(botToken);
             Console.WriteLine("Reminder sent successfully.");
         }
@@ -37,8 +39,8 @@ public class ReminderJob : IJob
             Console.WriteLine($"Error in ReminderJob: {ex.Message}");
         }
     }
-
-    public void CleanPayedList(string filePath)
+    
+    private void CleanPayedList(string filePath) // transfer to user server 
     {
         List<User> cleanPayList = new List<User>();
         string json = JsonConvert.SerializeObject(cleanPayList, Formatting.Indented);

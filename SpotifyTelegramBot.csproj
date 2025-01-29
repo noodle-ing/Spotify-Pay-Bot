@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <Compile Remove="Controllers\UserController.cs" />
+      <Compile Remove="Controllers\TelegramBotController.cs" />
     </ItemGroup>
 
 </Project>
