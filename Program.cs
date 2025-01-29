@@ -21,8 +21,9 @@ class Program
     
     private static readonly HttpClient client = new();
     
-    // static string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-    static string  filePath =Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/Subscribers.json"));
+    public static string  filePathSubscribers = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/Subscribers.json"));
+    public static string  filePathPayedUser = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/PayedUsers.json"));
+    
     static async Task Main()
     {
         _botClient = new TelegramBotClient("6919816985:AAH3l0FCjEMtojvl4HRydn6ia0U6jPo51xc"); 
@@ -128,10 +129,10 @@ class Program
         Console.WriteLine("Press [Enter] to exit...");
     }
 
-    private static bool CheckingUserMembership(long userId)
+    private static bool CheckingUserMembership(long userId) //
     {
         spotifyUsers =
-            LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json");
+            LoadUsers(filePathSubscribers);
         foreach (var user in spotifyUsers)
         {
             if (userId == user.Id)
@@ -142,9 +143,9 @@ class Program
         return false;
     }
 
-    private static bool UserNeedToPay(long userId)
+    private static bool UserNeedToPay(long userId) //
     {
-        payedUsers = LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json");
+        payedUsers = LoadUsers(filePathPayedUser);
         foreach (var user in payedUsers)
         {
             if (userId == user.Id)
@@ -155,10 +156,10 @@ class Program
         return true;
     }
     
-    private static bool NeedToRegister(long userId)
+    private static bool NeedToRegister(long userId) //
     {
         spotifyUsers =
-            LoadUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json");
+            LoadUsers(filePathSubscribers); 
         foreach (var user in spotifyUsers)
         {
             if (userId== user.Id)
@@ -170,20 +171,20 @@ class Program
     }
     
     
-    private static User RegisterNewUser(long userId)
+    private static User RegisterNewUser(long userId) //
     {
         User newRegisterUser = new User();
         newRegisterUser.Id = userId;
         return newRegisterUser; 
     }
     
-    static void SaveUsers(string filePath, List<User> users)
+    static void SaveUsers(string filePath, List<User> users) //
     {
         string json = JsonConvert.SerializeObject(users, Formatting.Indented);
         File.WriteAllText(filePath, json);
     }
     
-    public static List<User> LoadUsers(string filePath)
+    public static List<User> LoadUsers(string filePath) //
     {
         if (!File.Exists(filePath))
         {
@@ -213,14 +214,14 @@ class Program
         );
     }
 
-    private static async Task PaymentMessage(ITelegramBotClient botClient, long userId, long chatId, string userName)
+    private static async Task PaymentMessage(ITelegramBotClient botClient, long userId, long chatId, string userName) 
     {
         if (CheckingUserMembership(userId))
         {
             if (UserNeedToPay(userId))
             {
                 payedUsers.Add(RegisterNewUser(userId));
-                SaveUsers("C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json", payedUsers);
+                SaveUsers(filePathPayedUser, payedUsers);
                 Console.WriteLine($"{userId} добавлен в список оплаченных");
                 await botClient.SendTextMessageAsync(
                     chatId,
@@ -245,14 +246,14 @@ class Program
         }
     }
     
-    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId)
+    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId) //
     {
         if (spotifyUsers.Count < 5)
         {
             if (NeedToRegister(userId))
             {
                 spotifyUsers.Add(RegisterNewUser(userId));
-                SaveUsers(filePath, spotifyUsers);
+                SaveUsers(filePathSubscribers, spotifyUsers);
                 await botClient.SendTextMessageAsync(
                     chatId,
                     "Новый пользователь зарегестрирован"
