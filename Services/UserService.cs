@@ -16,7 +16,7 @@ public class UserService
         _update = update;
     }
     
-    private void UserCommandHandler()
+    public void UserCommandHandler()
     {
         var message = _update.Message;
         var chat = message.Chat;

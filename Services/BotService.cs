@@ -19,8 +19,9 @@ public class BotService
         _reminderService = reminderService;
     }
 
-    public void Command(Message message)
+    public void Command()
     {
+        var message = _update.Message;
         var chat = message.Chat;
 
         switch (_update.Type)
