@@ -20,7 +20,7 @@ class Program
 
     private static List<User> spotifyUsers = new ();
     private static List<User> payedUsers = new ();
-    
+    private static Update _update = new Update();
     private static readonly HttpClient client = new();
     
     public static string  filePathSubscribers = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/Subscribers.json"));
@@ -38,12 +38,15 @@ class Program
             },
             ThrowPendingUpdates = false  
         };
-        
+        // Update update = new Update();
         using var cts = new CancellationTokenSource();
-
-        var botController = new BotController(_botClient, cts.Token);
+        var botController = new BotController(_botClient, cts.Token, _update);
         
-        _botClient.StartReceiving(botController.UpdateHandler(),ErrorHandler, _receiverOptions, cts.Token); 
+        _botClient.StartReceiving(
+            updateHandler: (_botClient, update, arg3) => botController.UpdateHandler(),
+            ErrorHandler,
+            _receiverOptions,
+            cts.Token); 
         
         var me = await _botClient.GetMeAsync(); 
         Console.WriteLine($"{me.FirstName} is running!");
@@ -132,7 +135,7 @@ class Program
         Console.WriteLine("Press [Enter] to exit...");
     }
 
-    private static bool CheckingUserMembership(long userId) //..
+    private static bool CheckingUserMembership(long userId) 
     {
         spotifyUsers =
             LoadUsers(filePathSubscribers);
@@ -146,7 +149,7 @@ class Program
         return false;
     }
 
-    private static bool UserNeedToPay(long userId) //..
+    private static bool UserNeedToPay(long userId) 
     {
         payedUsers = LoadUsers(filePathPayedUser);
         foreach (var user in payedUsers)
@@ -159,7 +162,7 @@ class Program
         return true;
     }
     
-    private static bool NeedToRegister(long userId) //..
+    private static bool NeedToRegister(long userId) 
     {
         spotifyUsers =
             LoadUsers(filePathSubscribers); 
@@ -173,20 +176,20 @@ class Program
         return true;
     }
     
-    private static User RegisterNewUser(long userId) //
+    private static User RegisterNewUser(long userId) 
     {
         User newRegisterUser = new User();
         newRegisterUser.Id = userId;
         return newRegisterUser; 
     }
     
-    static void SaveUsers(string filePath, List<User> users) //...
+    static void SaveUsers(string filePath, List<User> users) 
     {
         string json = JsonConvert.SerializeObject(users, Formatting.Indented);
         File.WriteAllText(filePath, json);
     }
     
-    public static List<User> LoadUsers(string filePath) //...
+    public static List<User> LoadUsers(string filePath) 
     {
         if (!File.Exists(filePath))
         {

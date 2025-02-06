@@ -11,12 +11,14 @@ public class BotController
     private static Update _update;
     private static CancellationToken _cancellationToken;
     private UserService _userService;
-    private BotService _botService;
+    private static ReminderService _reminderService = new ReminderService(_botClient);
+    private BotService _botService = new BotService(_botClient, _update, _reminderService);
 
-    public BotController(ITelegramBotClient botClient, CancellationToken cancellationToken)
+    public BotController(ITelegramBotClient botClient, CancellationToken cancellationToken, Update update)
     {
         _botClient = botClient;
         _cancellationToken = cancellationToken;
+        _update = update;
     }
     
     public async Task UpdateHandler()

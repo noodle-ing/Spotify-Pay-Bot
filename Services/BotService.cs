@@ -43,7 +43,6 @@ public class BotService
                 return;
             }
         }
-        
     }
     
     private static async Task SendWelcomMessage(long chatId)
