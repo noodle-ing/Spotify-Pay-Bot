@@ -8,14 +8,11 @@ namespace SpotifyTelegramBot.Services;
 
 public class BotService
 {
-    // private static ITelegramBotClient _botClient;
-    // private static Update _update;
+    
     private static  ReminderService _reminderService;
 
-    public BotService(ITelegramBotClient botClient, Update update, ReminderService reminderService)
+    public BotService(ReminderService reminderService)
     {
-        // _botClient = botClient;
-        // _update = update;
         _reminderService = reminderService;
     }
 
@@ -71,7 +68,6 @@ public class BotService
             chatId,  
             $"Ежемесячные уведомления включены"
         );
-        // PaymentReminder();
         _reminderService.PaymentReminder();
     }
     

@@ -18,9 +18,6 @@ class Program
     private static Update _update = new Update();
     private static readonly HttpClient client = new();
     
-    public static string  filePathSubscribers = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/Subscribers.json"));
-    public static string  filePathPayedUser = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/PayedUsers.json"));
-    
     static async Task Main()
     {
         

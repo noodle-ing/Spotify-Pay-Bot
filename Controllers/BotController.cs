@@ -12,7 +12,7 @@ public class BotController
     private static CancellationToken _cancellationToken;
     private UserService _userService = new UserService();
     private static ReminderService _reminderService = new ReminderService(_botClient);
-    private BotService _botService = new (_botClient, _update, _reminderService);
+    private BotService _botService = new (_reminderService);
 
     public  BotController(ITelegramBotClient botClient, CancellationToken cancellationToken, Update update)
     {

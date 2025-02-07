@@ -29,7 +29,7 @@ public class UserService
                 {
                     var newUser = message.From;
                     long userId = newUser.Id;
-                    NewUserRegistration(botClient, newUser.Username, userId, chat.Id, botClient);
+                    NewUserRegistration(userId, chat.Id, botClient);
                     return;
 
                 }
@@ -73,7 +73,7 @@ public class UserService
     }
     
     
-    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId, ITelegramBotClient _botClient) 
+    private static async Task NewUserRegistration(long userId, long chatId, ITelegramBotClient _botClient) 
     {
         List<User> spotifyUsers = UserMaping.LoadUsersSubscribers();
         if (spotifyUsers.Count < 5)
