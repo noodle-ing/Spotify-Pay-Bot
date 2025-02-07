@@ -1,4 +1,5 @@
 using Quartz;
+using SpotifyTelegramBot.Maping;
 using Telegram.Bot;
 
 namespace SpotifyTelegramBot;
@@ -19,11 +20,12 @@ public class ForgetReminder : IJob
 
             var botClient = new TelegramBotClient(botToken);
 
-            string subscribersFilePath = "C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\Subscribers.json";
-            string payedUsersFilePath = "C:\\Users\\wonde\\Documents\\CSharp\\TelegtamBot\\SpotifyTelegramBot\\PayedUsers.json";
+            string  filePathSubscribers = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/Subscribers.json"));
+            string  filePathPayedUser = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/PayedUsers.json"));
 
-            var allUsers = Program.LoadUsers(subscribersFilePath);
-            var payedUsers = Program.LoadUsers(payedUsersFilePath);
+            UserMaping userMaping = new UserMaping();
+            var allUsers = userMaping.LoadUsers(filePathSubscribers);
+            var payedUsers = userMaping.LoadUsers(filePathPayedUser);
 
             var nonPayers = allUsers.Where(user => !payedUsers.Any(p => p.Id == user.Id)).ToList();
 

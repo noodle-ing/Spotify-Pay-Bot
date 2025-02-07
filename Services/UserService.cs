@@ -7,14 +7,6 @@ namespace SpotifyTelegramBot.Services;
 
 public class UserService
 {
-    // private static ITelegramBotClient _botClient;
-    // private Update _update;
-    //
-    // private UserService(ITelegramBotClient botClient, Update update)
-    // {
-    //     _botClient = botClient;
-    //     _update = update;
-    // }
     
     public void UserCommandHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {

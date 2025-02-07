@@ -84,5 +84,15 @@ public class UserMaping
         string json = File.ReadAllText(filePathPayedUser);
         return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
     }
+    
+    public List<User> LoadUsers(string filePath) 
+    {
+        if (!File.Exists(filePath))
+        {
+            return new List<User>();
+        }
+        string json = File.ReadAllText(filePath);
+        return JsonConvert.DeserializeObject<List<User>>(json) ?? new List<User>();
+    }
 
 }

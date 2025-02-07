@@ -35,7 +35,7 @@ public class BotController
     }
    
     
-    private static Task ErrorHandler( Exception error)
+    public static Task ErrorHandler( Exception error)
     {
         var ErrorMessage = error switch
         {

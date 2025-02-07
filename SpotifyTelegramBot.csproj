@@ -18,4 +18,8 @@
       <Compile Remove="Controllers\TelegramBotController.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Subscribers.json" />
+    </ItemGroup>
+
 </Project>
