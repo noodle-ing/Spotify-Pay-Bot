@@ -59,10 +59,16 @@ public class UserMaping
         return newRegisterUser; 
     }
     
-    public static void SaveUsers(List<User> users) 
+    public static void SaveUsersSub(List<User> users) 
     {
         string json = JsonConvert.SerializeObject(users, Formatting.Indented);
         File.WriteAllText(filePathSubscribers, json);
+    }
+    
+    public static void SaveUsersPayed(List<User> users) 
+    {
+        string json = JsonConvert.SerializeObject(users, Formatting.Indented);
+        File.WriteAllText(filePathPayedUser, json);
     }
     
     public static List<User> LoadUsersSubscribers() 

@@ -7,7 +7,7 @@ namespace SpotifyTelegramBot;
 
 public class ReminderJob : IJob
 {
-    private static long _chatId = -4606140584;
+    private static long _chatId = -4606140584; //add your chat id
     private string jsonPayedUserPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/PayedUsers.json"));
     
     
@@ -40,7 +40,7 @@ public class ReminderJob : IJob
         }
     }
     
-    private void CleanPayedList(string filePath) // transfer to user server 
+    private void CleanPayedList(string filePath) 
     {
         List<User> cleanPayList = new List<User>();
         string json = JsonConvert.SerializeObject(cleanPayList, Formatting.Indented);

@@ -47,7 +47,7 @@ public class UserService
             {
                 var newUser = UserMaping.RegisterNewUser(userId);
                 payedUsers.Add(newUser);
-                UserMaping.SaveUsers( payedUsers);
+                UserMaping.SaveUsersPayed(payedUsers);
                 Console.WriteLine($"{userId} добавлен в список оплаченных");
                 await _botClient.SendTextMessageAsync(
                     chatId,
@@ -81,7 +81,7 @@ public class UserService
             if (UserMaping.NeedToRegister(userId))
             {
                 spotifyUsers.Add(UserMaping.RegisterNewUser(userId));
-                UserMaping.SaveUsers(spotifyUsers);
+                UserMaping.SaveUsersSub(spotifyUsers);
                 await _botClient.SendTextMessageAsync(
                     chatId,
                     "Новый пользователь зарегестрирован"
