@@ -8,35 +8,35 @@ namespace SpotifyTelegramBot.Services;
 
 public class BotService
 {
-    private static ITelegramBotClient _botClient;
-    private static Update _update;
+    // private static ITelegramBotClient _botClient;
+    // private static Update _update;
     private static  ReminderService _reminderService;
 
     public BotService(ITelegramBotClient botClient, Update update, ReminderService reminderService)
     {
-        _botClient = botClient;
-        _update = update;
+        // _botClient = botClient;
+        // _update = update;
         _reminderService = reminderService;
     }
 
-    public void Command()
+    public void Command(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        var message = _update.Message;
+        var message = update.Message;
         var chat = message.Chat;
 
-        switch (_update.Type)
+        switch (update.Type)
         {
             case UpdateType.Message:
             {
                 if (message.Text == "/start")
                 {
-                    SendWelcomMessage(chat.Id);
+                    SendWelcomMessage(chat.Id, botClient);
                     return;
                 }
                 
                 if (message.Text == "/setReminder")
                 {
-                    RemindSender(chat.Id);
+                    RemindSender(chat.Id, botClient);
                     return;
                 }
 
@@ -45,9 +45,9 @@ public class BotService
         }
     }
     
-    private static async Task SendWelcomMessage(long chatId)
+    private static async Task SendWelcomMessage(long chatId, ITelegramBotClient botClient)
     {
-        await _botClient.SendTextMessageAsync(
+        await botClient.SendTextMessageAsync(
             chatId, 
             $"Всем привет это бот для ежемесячного \n" +
             $"напоминания об оплате подписки Spotify.\n" +
@@ -65,9 +65,9 @@ public class BotService
         );
     }
     
-    private static async Task RemindSender(long chatId)
+    private static async Task RemindSender(long chatId, ITelegramBotClient botClient)
     {
-        await _botClient.SendTextMessageAsync(
+        await botClient.SendTextMessageAsync(
             chatId,  
             $"Ежемесячные уведомления включены"
         );

@@ -15,7 +15,6 @@ using Update = Telegram.Bot.Types.Update;
 class Program
 {
     private static ITelegramBotClient _botClient;
-    
     private static ReceiverOptions _receiverOptions;
 
     private static List<User> spotifyUsers = new ();
@@ -38,15 +37,16 @@ class Program
             },
             ThrowPendingUpdates = false  
         };
-        // Update update = new Update();
+
         using var cts = new CancellationTokenSource();
-        var botController = new BotController(_botClient, cts.Token, _update);
-        
+        var botController = new BotController(_botClient, cts.Token, _update);  // Pass cts.Token only
+
         _botClient.StartReceiving(
-            updateHandler: (_botClient, update, arg3) => botController.UpdateHandler(),
+            botController.UpdateHandler,  // Pass method reference
             ErrorHandler,
             _receiverOptions,
-            cts.Token); 
+            cts.Token);
+
         
         var me = await _botClient.GetMeAsync(); 
         Console.WriteLine($"{me.FirstName} is running!");
@@ -54,52 +54,52 @@ class Program
         await Task.Delay(Timeout.Infinite);
     }
     
-    // private static async Task UpdateHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-    // {
-    //     try
-    //     {
-    //         var message = update.Message;
-    //         var chat = message.Chat;
-    //         switch (update.Type)
-    //         {
-    //             case UpdateType.Message:
-    //             {
-    //                 // _botController.UpdateHandler();
-    //                 // if (message.Text == "/start")  //done
-    //                 // {
-    //                 //     SendWelcomMessage(botClient, chat.Id);
-    //                 //     return;
-    //                 // }
-    //                 // if (message.Text == "/payed")
-    //                 // {
-    //                 //     var user = message.From;
-    //                 //     long userId = user.Id;
-    //                 //     var userName = user.Username;
-    //                 //     PaymentMessage(botClient, userId, chat.Id, userName);
-    //                 //     return;
-    //                 // }
-    //                 // if (message.Text == "/registerNewUser")
-    //                 // {
-    //                 //     var newUser = message.From;
-    //                 //     long userId = newUser.Id;
-    //                 //     NewUserRegistration(botClient, newUser.Username, userId, chat.Id);
-    //                 //     return;
-    //                 //
-    //                 // }
-    //                 // if (message.Text == "/setReminder")  //done
-    //                 // {
-    //                 //     RemindSender(botClient, chat.Id);
-    //                 //     return;
-    //                 // }
-    //                 return;
-    //             }
-    //         }
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine(ex.ToString());
-    //     }
-    // }
+    private static async Task UpdateHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var message = update.Message;
+            var chat = message.Chat;
+            switch (update.Type)
+            {
+                case UpdateType.Message:
+                {
+                    // _botController.UpdateHandler();
+                    // if (message.Text == "/start")  //done
+                    // {
+                    //     SendWelcomMessage(botClient, chat.Id);
+                    //     return;
+                    // }
+                    // if (message.Text == "/payed")
+                    // {
+                    //     var user = message.From;
+                    //     long userId = user.Id;
+                    //     var userName = user.Username;
+                    //     PaymentMessage(botClient, userId, chat.Id, userName);
+                    //     return;
+                    // }
+                    // if (message.Text == "/registerNewUser")
+                    // {
+                    //     var newUser = message.From;
+                    //     long userId = newUser.Id;
+                    //     NewUserRegistration(botClient, newUser.Username, userId, chat.Id);
+                    //     return;
+                    //
+                    // }
+                    // if (message.Text == "/setReminder")  //done
+                    // {
+                    //     RemindSender(botClient, chat.Id);
+                    //     return;
+                    // }
+                    return;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
     
     private static Task ErrorHandler(ITelegramBotClient botClient, Exception error, CancellationToken cancellationToken)
     {

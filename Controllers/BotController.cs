@@ -12,20 +12,20 @@ public class BotController
     private static CancellationToken _cancellationToken;
     private UserService _userService;
     private static ReminderService _reminderService = new ReminderService(_botClient);
-    private BotService _botService = new BotService(_botClient, _update, _reminderService);
+    private BotService _botService = new (_botClient, _update, _reminderService);
 
-    public BotController(ITelegramBotClient botClient, CancellationToken cancellationToken, Update update)
+    public  BotController(ITelegramBotClient botClient, CancellationToken cancellationToken, Update update)
     {
         _botClient = botClient;
         _cancellationToken = cancellationToken;
         _update = update;
     }
     
-    public async Task UpdateHandler()
+    public async Task UpdateHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         try
         {
-            _botService.Command();
+            _botService.Command(botClient, update, cancellationToken);
             _userService.UserCommandHandler();
         }
         catch(Exception ex)
