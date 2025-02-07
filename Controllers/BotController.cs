@@ -10,7 +10,7 @@ public class BotController
     private static ITelegramBotClient _botClient;
     private static Update _update;
     private static CancellationToken _cancellationToken;
-    private UserService _userService;
+    private UserService _userService = new UserService();
     private static ReminderService _reminderService = new ReminderService(_botClient);
     private BotService _botService = new (_botClient, _update, _reminderService);
 
@@ -26,7 +26,7 @@ public class BotController
         try
         {
             _botService.Command(botClient, update, cancellationToken);
-            _userService.UserCommandHandler();
+            _userService.UserCommandHandler(botClient, update, cancellationToken);
         }
         catch(Exception ex)
         {

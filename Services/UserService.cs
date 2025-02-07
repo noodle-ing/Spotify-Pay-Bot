@@ -7,20 +7,20 @@ namespace SpotifyTelegramBot.Services;
 
 public class UserService
 {
-    private static ITelegramBotClient _botClient;
-    private Update _update;
-
-    private UserService(ITelegramBotClient botClient, Update update)
-    {
-        _botClient = botClient;
-        _update = update;
-    }
+    // private static ITelegramBotClient _botClient;
+    // private Update _update;
+    //
+    // private UserService(ITelegramBotClient botClient, Update update)
+    // {
+    //     _botClient = botClient;
+    //     _update = update;
+    // }
     
-    public void UserCommandHandler()
+    public void UserCommandHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        var message = _update.Message;
+        var message = update.Message;
         var chat = message.Chat;
-        switch (_update.Type)
+        switch (update.Type)
         {
             case UpdateType.Message:
             {
@@ -29,7 +29,7 @@ public class UserService
                     var user = message.From;
                     long userId = user.Id;
                     var userName = user.Username;
-                    PaymentMessage( userId, chat.Id, userName);
+                    PaymentMessage( userId, chat.Id, userName, botClient);
                     return;
                 }
 
@@ -37,7 +37,7 @@ public class UserService
                 {
                     var newUser = message.From;
                     long userId = newUser.Id;
-                    NewUserRegistration(_botClient, newUser.Username, userId, chat.Id);
+                    NewUserRegistration(botClient, newUser.Username, userId, chat.Id, botClient);
                     return;
 
                 }
@@ -46,7 +46,7 @@ public class UserService
         }
     }
     
-    private static async Task PaymentMessage(long userId, long chatId, string userName) 
+    private static async Task PaymentMessage(long userId, long chatId, string userName, ITelegramBotClient _botClient) 
     {
         List<User> payedUsers = UserMaping.LoadUsersPayed();
         if (UserMaping.CheckingUserMembership(userId))
@@ -81,7 +81,7 @@ public class UserService
     }
     
     
-    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId) //
+    private static async Task NewUserRegistration(ITelegramBotClient botClient,string userName, long userId, long chatId, ITelegramBotClient _botClient) 
     {
         List<User> spotifyUsers = UserMaping.LoadUsersSubscribers();
         if (spotifyUsers.Count < 5)
