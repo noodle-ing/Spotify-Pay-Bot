@@ -5,7 +5,7 @@ namespace SpotifyTelegramBot.Maping;
 public class UserMaping
 {
     private static string  filePathSubscribers = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "json/Subscribers.json"));
-    private static string  filePathPayedUser = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"..", "..", "..","json/PayedUsers.json"));
+    private static string  filePathPayedUser = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "json/PayedUsers.json"));
     
     private static List<User> spotifyUsers = new ();
     private static List<User> payedUsers = new ();
